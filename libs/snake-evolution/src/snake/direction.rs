@@ -4,6 +4,10 @@ pub(crate) enum Direction {
     Down,
     Left,
     Right,
+    UpLeft,
+    UpRight,
+    DownLeft,
+    DownRight,
 }
 
 impl Direction {
@@ -23,6 +27,10 @@ impl Direction {
             Direction::Down => (0, 1),
             Direction::Left => (-1, 0),
             Direction::Right => (1, 0),
+            Direction::UpLeft => (-1, -1),
+            Direction::UpRight => (1, -1),
+            Direction::DownLeft => (-1, 1),
+            Direction::DownRight => (1, 1),
         }
     }
 }
@@ -37,5 +45,9 @@ mod tests {
         assert_eq!(Direction::Down.value(), (0, 1));
         assert_eq!(Direction::Left.value(), (-1, 0));
         assert_eq!(Direction::Right.value(), (1, 0));
+        assert_eq!(Direction::UpLeft.value(), (-1, -1));
+        assert_eq!(Direction::UpRight.value(), (1, -1));
+        assert_eq!(Direction::DownLeft.value(), (-1, 1));
+        assert_eq!(Direction::DownRight.value(), (1, 1));
     }
 }
