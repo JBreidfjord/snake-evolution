@@ -26,10 +26,12 @@ fn main() {
             (best_snake.game.score() as f32 / (GAME_GRID_SIZE.pow(2) - 2) as f32) * 100.0
         );
 
-        println!("Options:\n\t'c' -> Continue\n\t's' -> Save\n\t'q' -> Quit");
+        println!("Options:\n\t'c' -> Continue\n\t'b' -> Replay Best\n\t'w' -> Replay Worst\n\t's' -> Save Population\n\t'q' -> Quit");
         if let Ok(character) = stdout.read_char() {
             match character {
                 'c' => (),
+                'b' => evolution.replay("best"),
+                'w' => evolution.replay("worst"),
                 's' => evolution.save(),
                 'q' => break 'train_loop,
                 _ => break 'train_loop,

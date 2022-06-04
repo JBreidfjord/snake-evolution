@@ -11,3 +11,5 @@ lib-genetic-algorithm = { path = "../genetic-algorithm" }
 rand = "0.8.5"
 console = "0.15.0"
 ordered-float = "3.0.0"
+strum = "0.24.0"
+strum_macros = "0.24.0"

@@ -9,7 +9,7 @@ pub(crate) struct Game {
     snake: VecDeque<isize>,
     food: isize,
     score: usize,
-    steps: usize,
+    step_count: usize,
     finished: bool,
 }
 
@@ -40,12 +40,16 @@ impl Game {
             snake,
             food,
             score: 0,
-            steps: 0,
+            step_count: 0,
             finished: false,
         }
     }
 
     pub(crate) fn move_snake(&mut self, direction: Direction) {
+        if self.finished {
+            return;
+        }
+
         let (x, y) = direction.value();
         let mut head = *self.snake.back().unwrap();
 
@@ -65,7 +69,7 @@ impl Game {
     }
 
     fn step(&mut self) {
-        self.steps += 1;
+        self.step_count += 1;
         let head = *self.snake.back().unwrap();
 
         // Check if snake has moved off grid vertically
@@ -135,6 +139,26 @@ impl Game {
 
     pub(crate) fn finished(&self) -> bool {
         self.finished
+    }
+
+    pub(crate) fn score(&self) -> usize {
+        self.score
+    }
+
+    pub(crate) fn step_count(&self) -> usize {
+        self.step_count
+    }
+
+    pub(crate) fn snake(&self) -> &VecDeque<isize> {
+        &self.snake
+    }
+
+    pub(crate) fn food(&self) -> isize {
+        self.food
+    }
+
+    pub(crate) fn size(&self) -> isize {
+        self.size
     }
 }
 

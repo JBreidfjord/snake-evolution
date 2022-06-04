@@ -1,4 +1,6 @@
-#[derive(PartialEq)]
+use strum_macros::EnumIter;
+
+#[derive(PartialEq, EnumIter)]
 pub(crate) enum Direction {
     Up,
     Down,

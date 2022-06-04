@@ -41,24 +41,16 @@ impl Evolution {
     }
 
     pub(crate) fn step(&mut self, rng: &mut dyn RngCore) {
-        self.process_brains();
         self.process_movement();
-        self.process_finished_games();
         self.process_evolution(rng);
 
         self.age += 1;
     }
 
-    fn process_brains(&mut self) {
-        todo!("Implement process brains")
-    }
-
     fn process_movement(&mut self) {
-        todo!("Implement process movement")
-    }
-
-    fn process_finished_games(&mut self) {
-        todo!("Implement process finished games")
+        for snake in &mut self.population {
+            snake.make_move();
+        }
     }
 
     fn process_evolution(&mut self, rng: &mut dyn RngCore) {
@@ -84,7 +76,31 @@ impl Evolution {
             .unwrap()
     }
 
+    fn worst_individual(&self) -> &Snake {
+        self.population
+            .iter()
+            .min_by_key(|s| OrderedFloat::from(s.fitness()))
+            .unwrap()
+    }
+
     pub(crate) fn age(&self) -> usize {
         self.age
+    }
+
+    pub(crate) fn replay(&self, which: &str) {
+        if which != "best" || which != "worst" {
+            return;
+        }
+
+        let snake = if which == "best" {
+            self.best_individual()
+        } else {
+            self.worst_individual()
+        };
+
+        for display in &snake.history {
+            print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
+            println!("{}", display);
+        }
     }
 }
