@@ -84,11 +84,17 @@ impl Game {
     }
 
     fn place_food(&mut self) {
-        todo!("Place food")
+        let snake_set: HashSet<isize> = self.snake.iter().cloned().collect();
+        let board_set: HashSet<isize> =
+            HashSet::from_iter((0..self.size.pow(2)).collect::<Vec<_>>());
+        let valid_squares = &board_set - &snake_set;
+        self.food = *valid_squares.iter().next().unwrap();
+        self.score += 1;
     }
 
     fn game_over(&mut self) {
-        todo!("Game over!");
+        self.finished = true;
+        println!("Game over! Your score was {}", self.score);
     }
 
     pub(crate) fn display(&self) -> String {
