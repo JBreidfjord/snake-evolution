@@ -9,6 +9,7 @@ pub(crate) struct Game {
     snake: VecDeque<isize>,
     food: isize,
     score: usize,
+    steps: usize,
     finished: bool,
 }
 
@@ -39,6 +40,7 @@ impl Game {
             snake,
             food,
             score: 0,
+            steps: 0,
             finished: false,
         }
     }
@@ -63,6 +65,7 @@ impl Game {
     }
 
     fn step(&mut self) {
+        self.steps += 1;
         let head = *self.snake.back().unwrap();
 
         // Check if snake has moved off grid vertically
@@ -77,6 +80,7 @@ impl Game {
 
         // Check if snake found the food
         if head == self.food {
+            self.score += 1;
             self.place_food();
         } else if self.snake.len() > MIN_SNAKE_LENGTH {
             self.snake.pop_front();
@@ -89,7 +93,6 @@ impl Game {
             HashSet::from_iter((0..self.size.pow(2)).collect::<Vec<_>>());
         let valid_squares = &board_set - &snake_set;
         self.food = *valid_squares.iter().next().unwrap();
-        self.score += 1;
     }
 
     fn game_over(&mut self) {
