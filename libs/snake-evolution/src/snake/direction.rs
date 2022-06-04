@@ -7,6 +7,16 @@ pub(crate) enum Direction {
 }
 
 impl Direction {
+    pub(crate) fn from_index(index: usize) -> Direction {
+        match index {
+            0 => Direction::Up,
+            1 => Direction::Down,
+            2 => Direction::Left,
+            3 => Direction::Right,
+            _ => panic!("Index must be <= 3"),
+        }
+    }
+
     pub(crate) fn value(&self) -> (isize, isize) {
         match *self {
             Direction::Up => (0, -1),
