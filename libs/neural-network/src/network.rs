@@ -11,21 +11,23 @@ impl Network {
 
         let layers = layers
             .windows(2)
-            .map(|layers| Layer::random(rng, layers[0].neurons, layers[1].neurons))
+            .map(|layers| {
+                Layer::random(
+                    rng,
+                    layers[0].neurons,
+                    layers[1].neurons,
+                    layers[0].activation,
+                )
+            })
             .collect();
 
         Network { layers }
     }
 
     pub fn propagate(&self, inputs: Vec<f32>) -> Vec<f32> {
-        let mut activation_iter = (0..3).map(move |i| match i {
-            0..=1 => true,
-            2 => false,
-            _ => unreachable!(),
-        });
-        self.layers.iter().fold(inputs, |inputs, layer| {
-            layer.propagate(inputs, activation_iter.next())
-        })
+        self.layers
+            .iter()
+            .fold(inputs, |inputs, layer| layer.propagate(inputs))
     }
 
     pub fn weights(&self) -> impl Iterator<Item = f32> + '_ {
@@ -47,7 +49,14 @@ impl Network {
         let mut weights = weights.into_iter();
         let layers = layers
             .windows(2)
-            .map(|layers| Layer::from_weights(layers[0].neurons, layers[1].neurons, &mut weights))
+            .map(|layers| {
+                Layer::from_weights(
+                    layers[0].neurons,
+                    layers[1].neurons,
+                    &mut weights,
+                    layers[0].activation,
+                )
+            })
             .collect();
 
         if weights.next().is_some() {
@@ -73,7 +82,16 @@ mod tests {
             let mut rng = ChaCha8Rng::from_seed(Default::default());
             let network = Network::random(
                 &mut rng,
-                &[LayerTopology { neurons: 2 }, LayerTopology { neurons: 2 }],
+                &[
+                    LayerTopology {
+                        neurons: 2,
+                        activation: Activation::None,
+                    },
+                    LayerTopology {
+                        neurons: 2,
+                        activation: Activation::None,
+                    },
+                ],
             );
 
             assert_eq!(network.layers.len(), 1);
@@ -112,6 +130,7 @@ mod tests {
                                 bias: 0.5,
                             },
                         ],
+                        activation: Activation::None,
                     },
                     Layer {
                         neurons: vec![
@@ -124,6 +143,7 @@ mod tests {
                                 bias: 0.5,
                             },
                         ],
+                        activation: Activation::None,
                     },
                 ],
             };
@@ -139,7 +159,16 @@ mod tests {
 
         #[test]
         fn test() {
-            let layers = &[LayerTopology { neurons: 3 }, LayerTopology { neurons: 2 }];
+            let layers = &[
+                LayerTopology {
+                    neurons: 3,
+                    activation: Activation::None,
+                },
+                LayerTopology {
+                    neurons: 2,
+                    activation: Activation::None,
+                },
+            ];
             let weights = vec![0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
             let network = Network::from_weights(layers, weights.clone());
             let actual: Vec<_> = network.weights().collect();

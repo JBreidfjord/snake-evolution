@@ -3,6 +3,7 @@ use crate::*;
 #[derive(Debug, Clone)]
 pub(crate) struct Layer {
     pub(crate) neurons: Vec<Neuron>,
+    pub(crate) activation: Activation,
 }
 
 impl Layer {
@@ -10,31 +11,42 @@ impl Layer {
         rng: &mut dyn rand::RngCore,
         input_neurons: usize,
         output_neurons: usize,
+        activation: Activation,
     ) -> Layer {
         let neurons = (0..output_neurons)
             .map(|_| Neuron::random(rng, input_neurons))
             .collect();
 
-        Layer { neurons }
+        Layer {
+            neurons,
+            activation,
+        }
     }
 
-    pub(crate) fn propagate(&self, inputs: Vec<f32>, activate: Option<bool>) -> Vec<f32> {
-        self.neurons
+    pub(crate) fn propagate(&self, inputs: Vec<f32>) -> Vec<f32> {
+        let outputs = self
+            .neurons
             .iter()
-            .map(|neuron| neuron.propagate(&inputs, activate))
-            .collect()
+            .map(|neuron| neuron.propagate(&inputs))
+            .collect();
+
+        self.activation.apply(outputs)
     }
 
     pub fn from_weights(
         input_size: usize,
         output_size: usize,
         weights: &mut dyn Iterator<Item = f32>,
+        activation: Activation,
     ) -> Layer {
         let neurons = (0..output_size)
             .map(|_| Neuron::from_weights(input_size, weights))
             .collect();
 
-        Layer { neurons }
+        Layer {
+            neurons,
+            activation,
+        }
     }
 }
 
@@ -51,7 +63,7 @@ mod tests {
         #[test]
         fn test() {
             let mut rng = ChaCha8Rng::from_seed(Default::default());
-            let layer = Layer::random(&mut rng, 2, 2);
+            let layer = Layer::random(&mut rng, 2, 2, Activation::None);
 
             assert_relative_eq!(layer.neurons[0].bias, 0.8181262);
             assert_relative_eq!(
@@ -84,9 +96,10 @@ mod tests {
                         bias: 0.5,
                     },
                 ],
+                activation: Activation::None,
             };
 
-            let prop = layer.propagate(vec![0.3, 0.6], None);
+            let prop = layer.propagate(vec![0.3, 0.6]);
             assert_relative_eq!(prop.as_slice(), [0.525, 0.95].as_ref());
         }
     }

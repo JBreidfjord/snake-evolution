@@ -1,5 +1,7 @@
-use lib_neural_network::{LayerTopology, Network};
 use rand::prelude::*;
+
+use lib_genetic_algorithm::Chromosome;
+use lib_neural_network::{Activation, LayerTopology, Network};
 
 pub(crate) struct Brain {
     pub(crate) nn: Network,
@@ -14,10 +16,32 @@ impl Brain {
 
     fn topology() -> [LayerTopology; 4] {
         [
-            LayerTopology { neurons: 24 },
-            LayerTopology { neurons: 18 },
-            LayerTopology { neurons: 18 },
-            LayerTopology { neurons: 4 },
+            LayerTopology {
+                neurons: 24,
+                activation: Activation::ReLU,
+            },
+            LayerTopology {
+                neurons: 18,
+                activation: Activation::ReLU,
+            },
+            LayerTopology {
+                neurons: 18,
+                activation: Activation::ReLU,
+            },
+            LayerTopology {
+                neurons: 4,
+                activation: Activation::Softmax,
+            },
         ]
+    }
+
+    pub(crate) fn as_chromosome(&self) -> Chromosome {
+        self.nn.weights().collect()
+    }
+
+    pub(crate) fn from_chromosome(chromosome: Chromosome) -> Brain {
+        Brain {
+            nn: Network::from_weights(&Self::topology(), chromosome),
+        }
     }
 }

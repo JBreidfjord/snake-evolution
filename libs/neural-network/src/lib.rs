@@ -1,8 +1,9 @@
 use rand::Rng;
 
+pub use self::{activation::*, layer_topology::*, network::*};
 use self::{layer::*, neuron::*};
-pub use self::{layer_topology::*, network::*};
 
+mod activation;
 mod layer;
 mod layer_topology;
 mod network;
