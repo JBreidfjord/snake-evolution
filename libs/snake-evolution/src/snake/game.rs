@@ -1,5 +1,9 @@
 use std::collections::{HashSet, VecDeque};
 
+use crate::snake::direction::Direction;
+
+const MIN_SNAKE_LENGTH: usize = 2;
+
 pub(crate) struct Game {
     size: isize,
     snake: VecDeque<isize>,
@@ -31,8 +35,85 @@ impl Game {
         Game { size, snake, food }
     }
 
-}
+    pub(crate) fn move_snake(&mut self, direction: Direction) {
+        let (x, y) = direction.value();
+        let mut head = *self.snake.back().unwrap();
 
+        // Check if next move would cause snake to collide with wall
+        if (head % self.size == self.size - 1 && direction == Direction::Right)
+            || (head % self.size == 0 && direction == Direction::Left)
+        {
+            self.game_over()
+        }
+
+        // Add x and y values to current head index
+        // y is multiplied by grid size to shift index by a whole row
+        head += x + y * self.size;
+        self.snake.push_back(head);
+
+        self.step();
+    }
+
+    fn step(&mut self) {
+        let head = *self.snake.back().unwrap();
+
+        // Check if snake has moved off grid vertically
+        if !(0..self.size.pow(2)).contains(&head) {
+            self.game_over()
+        }
+
+        // Check if snake moved into itself
+        if self.snake.iter().filter(|i| *i == &head).count() > 1 {
+            self.game_over()
+        }
+
+        // Check if snake found the food
+        if head == self.food {
+            self.place_food();
+        } else if self.snake.len() > MIN_SNAKE_LENGTH {
+            self.snake.pop_front();
+        }
+    }
+
+    fn place_food(&mut self) {
+        todo!("Place food")
+    }
+
+    fn game_over(&mut self) {
+        todo!("Game over!");
+    }
+
+    pub(crate) fn display(&self) -> String {
+        let head = *self.snake.back().unwrap();
+
+        let mut out = String::from("|");
+        for _ in 0..self.size {
+            out += "---"
+        }
+
+        let range = (0..self.size.pow(2)).step_by(self.size.try_into().unwrap());
+        for y in range {
+            out += "|\n|";
+            for x in 0..self.size {
+                let i = y + x;
+                out += match i {
+                    n if n == head => " \u{25A1} ",
+                    n if n == self.food => " \u{2022} ",
+                    n if self.snake.contains(&n) => " \u{25A0} ",
+                    _ => "   ",
+                };
+            }
+        }
+
+        out += "|\n|";
+        for _ in 0..self.size {
+            out += "---"
+        }
+        out += "|";
+
+        out
+    }
+}
 
 #[cfg(test)]
 mod tests {
