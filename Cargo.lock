@@ -116,6 +116,7 @@ version = "0.1.0"
 dependencies = [
  "lib-genetic-algorithm",
  "lib-neural-network",
+ "rand",
 ]
 
 [[package]]
