@@ -10,6 +10,10 @@ impl Chromosome {
         self.genes.len()
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.genes.is_empty()
+    }
+
     pub fn iter(&self) -> impl Iterator<Item = &f32> {
         self.genes.iter()
     }
@@ -49,7 +53,7 @@ impl FromIterator<f32> for Chromosome {
 
 impl IntoIterator for Chromosome {
     type Item = f32;
-    type IntoIter = impl Iterator<Item = f32>;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.genes.into_iter()

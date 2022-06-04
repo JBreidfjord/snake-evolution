@@ -1,6 +1,3 @@
-#![feature(type_alias_impl_trait)]
-#![feature(crate_visibility_modifier)]
-
 use rand::seq::SliceRandom;
 use rand::Rng;
 use std::iter::FromIterator;
@@ -47,7 +44,7 @@ where
     {
         assert!(!population.is_empty());
 
-        let new_population = (0..population.len())
+        (0..population.len())
             .map(|_| {
                 // Selection
                 let parent_a = self.selection_method.select(rng, population).chromosome();
@@ -61,9 +58,7 @@ where
 
                 I::create(child)
             })
-            .collect();
-
-        new_population
+            .collect()
     }
 
     pub fn breed<I>(&self, rng: &mut dyn rand::RngCore, parent_a: I, parent_b: I) -> I

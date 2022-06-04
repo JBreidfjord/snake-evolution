@@ -25,6 +25,12 @@ impl SelectionMethod for RouletteWheelSelection {
     }
 }
 
+impl Default for RouletteWheelSelection {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

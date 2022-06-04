@@ -1,9 +1,9 @@
 use crate::*;
 
 #[derive(Debug, Clone)]
-crate struct Neuron {
-    crate weights: Vec<f32>,
-    crate bias: f32,
+pub(crate) struct Neuron {
+    pub(crate) weights: Vec<f32>,
+    pub(crate) bias: f32,
 }
 
 impl Neuron {
@@ -17,7 +17,7 @@ impl Neuron {
         Neuron { weights, bias }
     }
 
-    crate fn propagate(&self, inputs: &Vec<f32>, activate: Option<bool>) -> f32 {
+    pub(crate) fn propagate(&self, inputs: &[f32], activate: Option<bool>) -> f32 {
         let sum = inputs
             .iter()
             .zip(&self.weights)
@@ -74,12 +74,12 @@ mod tests {
             };
 
             // Ensures ReLU activation function is used
-            assert_relative_eq!(neuron.propagate(&vec![-10.0, -10.0], None), 0.0);
+            assert_relative_eq!(neuron.propagate(&[-10.0, -10.0], None), 0.0);
 
             // Test deactivating the activation function
-            assert_relative_eq!(neuron.propagate(&vec![-10.0, -10.0], Some(false)), -9.5);
+            assert_relative_eq!(neuron.propagate(&[-10.0, -10.0], Some(false)), -9.5);
 
-            assert_relative_eq!(neuron.propagate(&vec![1.0, 0.5], None), 1.25);
+            assert_relative_eq!(neuron.propagate(&[1.0, 0.5], None), 1.25);
         }
     }
 }

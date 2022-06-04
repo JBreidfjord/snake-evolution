@@ -1,5 +1,3 @@
-#![feature(crate_visibility_modifier)]
-
 use rand::Rng;
 
 use self::{layer::*, neuron::*};

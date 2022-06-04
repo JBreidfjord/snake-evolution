@@ -36,6 +36,12 @@ impl CrossoverMethod for UniformCrossover {
     }
 }
 
+impl Default for UniformCrossover {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -73,7 +73,7 @@ mod tests {
             let mut rng = ChaCha8Rng::from_seed(Default::default());
             let network = Network::random(
                 &mut rng,
-                &vec![LayerTopology { neurons: 2 }, LayerTopology { neurons: 2 }],
+                &[LayerTopology { neurons: 2 }, LayerTopology { neurons: 2 }],
             );
 
             assert_eq!(network.layers.len(), 1);

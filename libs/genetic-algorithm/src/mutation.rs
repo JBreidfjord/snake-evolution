@@ -13,7 +13,7 @@ pub struct GaussianMutation {
 
 impl GaussianMutation {
     pub fn new(rate: f32, factor: f32) -> GaussianMutation {
-        assert!(rate >= 0.0 && rate <= 1.0);
+        assert!((0.0..=1.0).contains(&rate));
 
         GaussianMutation { rate, factor }
     }

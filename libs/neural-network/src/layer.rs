@@ -1,8 +1,8 @@
 use crate::*;
 
 #[derive(Debug, Clone)]
-crate struct Layer {
-    crate neurons: Vec<Neuron>,
+pub(crate) struct Layer {
+    pub(crate) neurons: Vec<Neuron>,
 }
 
 impl Layer {
@@ -18,7 +18,7 @@ impl Layer {
         Layer { neurons }
     }
 
-    crate fn propagate(&self, inputs: Vec<f32>, activate: Option<bool>) -> Vec<f32> {
+    pub(crate) fn propagate(&self, inputs: Vec<f32>, activate: Option<bool>) -> Vec<f32> {
         self.neurons
             .iter()
             .map(|neuron| neuron.propagate(&inputs, activate))
