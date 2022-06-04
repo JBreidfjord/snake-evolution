@@ -221,4 +221,19 @@ mod tests {
             assert_eq!(game.score, 1);
         }
     }
+
+    mod food {
+        use super::*;
+
+        #[test]
+        fn test_place_food() {
+            let mut game = Game::new(3);
+            game.food = 3;
+            game.move_snake(Direction::Left);
+
+            assert!((0..9).contains(&game.food));
+            assert_ne!(game.food, 4);
+            assert_ne!(game.food, 3);
+        }
+    }
 }
