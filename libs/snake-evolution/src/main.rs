@@ -13,6 +13,10 @@ fn main() {
         stdout.clear_screen().unwrap_or_default();
         println!("{}", game.display());
 
+        if game.finished() {
+            break 'game_loop;
+        }
+
         let direction = if let Ok(character) = stdout.read_char() {
             match character {
                 'w' => Direction::Up,

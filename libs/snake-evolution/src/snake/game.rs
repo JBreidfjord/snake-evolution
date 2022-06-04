@@ -127,6 +127,10 @@ impl Game {
 
         out
     }
+
+    pub(crate) fn finished(&self) -> bool {
+        self.finished
+    }
 }
 
 #[cfg(test)]
