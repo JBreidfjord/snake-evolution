@@ -9,3 +9,4 @@ edition = "2021"
 lib-neural-network = { path = "../neural-network" }
 lib-genetic-algorithm = { path = "../genetic-algorithm" }
 rand = "0.8.5"
+console = "0.15.0"
