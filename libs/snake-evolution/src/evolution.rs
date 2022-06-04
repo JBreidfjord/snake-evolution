@@ -1,3 +1,4 @@
+use ordered_float::OrderedFloat;
 use rand::prelude::*;
 
 use lib_genetic_algorithm::{
@@ -11,7 +12,6 @@ mod snake;
 mod snake_individual;
 
 const POPULATION_SIZE: usize = 2000;
-const GAME_GRID_SIZE: usize = 10;
 const MUTATION_RATE: f32 = 0.15;
 const MUTATION_STRENGTH: f32 = 0.3;
 const GENERATION_LENGTH: usize = 10_000;
@@ -23,9 +23,9 @@ pub(crate) struct Evolution {
 }
 
 impl Evolution {
-    pub(crate) fn random(rng: &mut dyn RngCore) -> Evolution {
+    pub(crate) fn random(rng: &mut dyn RngCore, game_grid_size: isize) -> Evolution {
         let population: Vec<Snake> = (0..POPULATION_SIZE)
-            .map(|_| Snake::random(rng, GAME_GRID_SIZE))
+            .map(|_| Snake::random(rng, game_grid_size))
             .collect();
         let ga = GeneticAlgorithm::new(
             RouletteWheelSelection::new(),
@@ -67,8 +67,24 @@ impl Evolution {
 
     /// Step until end of current generation
     pub(crate) fn train(&mut self, rng: &mut dyn RngCore) {
+        // TODO: Add progress bar
         while self.age < GENERATION_LENGTH {
             self.step(rng);
         }
+    }
+
+    pub(crate) fn save(&self) {
+        todo!("Implement save")
+    }
+
+    pub(crate) fn best_individual(&self) -> &Snake {
+        self.population
+            .iter()
+            .max_by_key(|s| OrderedFloat::from(s.fitness()))
+            .unwrap()
+    }
+
+    pub(crate) fn age(&self) -> usize {
+        self.age
     }
 }
