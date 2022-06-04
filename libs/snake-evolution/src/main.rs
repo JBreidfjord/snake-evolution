@@ -10,12 +10,8 @@ fn main() {
     let mut game = Game::new(10);
 
     'game_loop: loop {
-        stdout.clear_screen().unwrap_or_default();
+        print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
         println!("{}", game.display());
-
-        if game.finished() {
-            break 'game_loop;
-        }
 
         let direction = if let Ok(character) = stdout.read_char() {
             match character {
@@ -30,5 +26,9 @@ fn main() {
         };
 
         game.move_snake(direction);
+
+        if game.finished() {
+            break 'game_loop;
+        }
     }
 }

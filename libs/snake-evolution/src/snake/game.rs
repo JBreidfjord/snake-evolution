@@ -94,7 +94,7 @@ impl Game {
 
     fn game_over(&mut self) {
         self.finished = true;
-        println!("Game over! Your score was {}", self.score);
+        println!("Game over!");
     }
 
     pub(crate) fn display(&self) -> String {
@@ -123,7 +123,9 @@ impl Game {
         for _ in 0..self.size {
             out += "---"
         }
-        out += "|";
+        out += "|\n";
+
+        out += &format!("Score: {}", self.score);
 
         out
     }
