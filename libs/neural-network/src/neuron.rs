@@ -67,10 +67,6 @@ mod tests {
                 bias: 0.5,
             };
 
-            // Ensures ReLU activation function is used
-            assert_relative_eq!(neuron.propagate(&[-10.0, -10.0]), 0.0);
-
-            // Test deactivating the activation function
             assert_relative_eq!(neuron.propagate(&[-10.0, -10.0]), -9.5);
 
             assert_relative_eq!(neuron.propagate(&[1.0, 0.5]), 1.25);

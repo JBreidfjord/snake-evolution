@@ -102,5 +102,57 @@ mod tests {
             let prop = layer.propagate(vec![0.3, 0.6]);
             assert_relative_eq!(prop.as_slice(), [0.525, 0.95].as_ref());
         }
+
+        #[test]
+        fn test_activation_functions() {
+            let relu_layer = Layer {
+                neurons: vec![
+                    Neuron {
+                        weights: vec![0.25, 0.75],
+                        bias: 0.0,
+                    },
+                    Neuron {
+                        weights: vec![0.5, 0.5],
+                        bias: -0.5,
+                    },
+                ],
+                activation: Activation::ReLU,
+            };
+            let prop = relu_layer.propagate(vec![0.3, 0.6]);
+            assert_relative_eq!(prop.as_slice(), [0.525, 0.0].as_ref());
+
+            let sigmoid_layer = Layer {
+                neurons: vec![
+                    Neuron {
+                        weights: vec![0.25, 0.75],
+                        bias: 1.0,
+                    },
+                    Neuron {
+                        weights: vec![1.5, -1.0],
+                        bias: -0.5,
+                    },
+                ],
+                activation: Activation::Sigmoid,
+            };
+            let prop = sigmoid_layer.propagate(vec![0.3, 0.6]);
+            assert_relative_eq!(prop.as_slice(), [0.82127357, 0.34298956].as_ref());
+
+            let softmax_layer = Layer {
+                neurons: vec![
+                    Neuron {
+                        weights: vec![0.25, 0.75],
+                        bias: 0.0,
+                    },
+                    Neuron {
+                        weights: vec![0.5, 0.5],
+                        bias: 0.5,
+                    },
+                ],
+                activation: Activation::Softmax,
+            };
+            let prop = softmax_layer.propagate(vec![0.3, 0.6]);
+            assert_relative_eq!(prop.iter().sum::<f32>(), 1.0);
+            assert_relative_eq!(prop.as_slice(), [0.3953209, 0.60467905].as_ref());
+        }
     }
 }

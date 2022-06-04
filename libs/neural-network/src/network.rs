@@ -16,7 +16,7 @@ impl Network {
                     rng,
                     layers[0].neurons,
                     layers[1].neurons,
-                    layers[0].activation,
+                    layers[1].activation,
                 )
             })
             .collect();
@@ -54,7 +54,7 @@ impl Network {
                     layers[0].neurons,
                     layers[1].neurons,
                     &mut weights,
-                    layers[0].activation,
+                    layers[1].activation,
                 )
             })
             .collect();
@@ -70,12 +70,12 @@ impl Network {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
+    use rand::SeedableRng;
+    use rand_chacha::ChaCha8Rng;
 
     mod random {
         use super::*;
-        use approx::assert_relative_eq;
-        use rand::SeedableRng;
-        use rand_chacha::ChaCha8Rng;
 
         #[test]
         fn test() {
@@ -113,7 +113,6 @@ mod tests {
 
     mod propagate {
         use super::*;
-        use approx::assert_relative_eq;
 
         #[test]
         fn test() {
@@ -150,6 +149,70 @@ mod tests {
 
             let prop = network.propagate(vec![0.3, 0.6]);
             assert_relative_eq!(prop.as_slice(), [0.84375, 1.2375].as_ref());
+        }
+
+        #[test]
+        fn test_activation_functions() {
+            let network = Network {
+                layers: vec![
+                    Layer {
+                        neurons: vec![
+                            Neuron {
+                                weights: vec![0.25, 0.75],
+                                bias: 0.0,
+                            },
+                            Neuron {
+                                weights: vec![0.5, 0.5],
+                                bias: 0.5,
+                            },
+                        ],
+                        activation: Activation::ReLU,
+                    },
+                    Layer {
+                        neurons: vec![
+                            Neuron {
+                                weights: vec![0.25, 0.75],
+                                bias: 0.0,
+                            },
+                            Neuron {
+                                weights: vec![0.5, 0.5],
+                                bias: 0.5,
+                            },
+                        ],
+                        activation: Activation::Softmax,
+                    },
+                ],
+            };
+
+            let prop = network.propagate(vec![0.3, 0.6]);
+            assert_relative_eq!(prop.iter().sum::<f32>(), 1.0);
+            assert_relative_eq!(prop.as_slice(), [0.4028149, 0.5971851].as_ref());
+        }
+
+        #[test]
+        fn test_random_with_activation_functions() {
+            let mut rng = ChaCha8Rng::from_seed(Default::default());
+            let topology = [
+                LayerTopology {
+                    neurons: 6,
+                    activation: Activation::ReLU,
+                },
+                LayerTopology {
+                    neurons: 4,
+                    activation: Activation::ReLU,
+                },
+                LayerTopology {
+                    neurons: 4,
+                    activation: Activation::ReLU,
+                },
+                LayerTopology {
+                    neurons: 4,
+                    activation: Activation::Softmax,
+                },
+            ];
+            let network = Network::random(&mut rng, &topology);
+            let prop = network.propagate(vec![0.5, 1.0, 0.0, -0.5]);
+            assert_relative_eq!(prop.iter().sum::<f32>(), 1.0);
         }
     }
 
