@@ -8,6 +8,8 @@ pub(crate) struct Game {
     size: isize,
     snake: VecDeque<isize>,
     food: isize,
+    score: usize,
+    finished: bool,
 }
 
 impl Game {
@@ -32,7 +34,13 @@ impl Game {
         let valid_squares = &board_set - &snake_set;
         let food = *valid_squares.iter().next().unwrap();
 
-        Game { size, snake, food }
+        Game {
+            size,
+            snake,
+            food,
+            score: 0,
+            finished: false,
+        }
     }
 
     pub(crate) fn move_snake(&mut self, direction: Direction) {
@@ -149,8 +157,9 @@ mod tests {
         #[test]
         fn test_move() {
             let mut game = Game::new(3);
-            game.move_snake(Direction::Left);
             game.food = 0;
+
+            game.move_snake(Direction::Left);
             assert_eq!(game.snake, VecDeque::from([4, 3]));
 
             game.move_snake(Direction::Down);
@@ -161,6 +170,55 @@ mod tests {
 
             game.move_snake(Direction::Up);
             assert_eq!(game.snake, VecDeque::from([7, 4]));
+        }
+
+        #[test]
+        fn test_wall_collisions() {
+            let mut game = Game::new(3);
+            game.food = 0;
+            game.move_snake(Direction::Left);
+            game.move_snake(Direction::Left);
+            assert!(game.finished);
+
+            let mut game = Game::new(3);
+            game.food = 0;
+            game.move_snake(Direction::Up);
+            game.move_snake(Direction::Up);
+            assert!(game.finished);
+
+            let mut game = Game::new(3);
+            game.food = 0;
+            game.move_snake(Direction::Right);
+            game.move_snake(Direction::Right);
+            assert!(game.finished);
+
+            let mut game = Game::new(3);
+            game.food = 0;
+            game.move_snake(Direction::Down);
+            game.move_snake(Direction::Down);
+            assert!(game.finished);
+        }
+
+        #[test]
+        fn test_snake_collision() {
+            let mut game = Game::new(3);
+            game.food = 0;
+
+            game.move_snake(Direction::Left);
+            game.move_snake(Direction::Right);
+            assert!(game.finished);
+        }
+
+        #[test]
+        fn test_food_collision() {
+            let mut game = Game::new(3);
+            game.food = 0;
+
+            game.move_snake(Direction::Left);
+            game.move_snake(Direction::Up);
+            assert_eq!(game.snake.len(), 3);
+            assert_eq!(game.snake, VecDeque::from([4, 3, 0]));
+            assert_eq!(game.score, 1);
         }
     }
 }
