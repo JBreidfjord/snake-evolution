@@ -6,7 +6,6 @@ use lib_genetic_algorithm::{
 
 use snake::Snake;
 
-mod body;
 mod brain;
 mod snake;
 mod snake_individual;
