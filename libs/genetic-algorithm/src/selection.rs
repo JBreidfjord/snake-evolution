@@ -21,7 +21,7 @@ impl SelectionMethod for RouletteWheelSelection {
     {
         population
             .choose_weighted(rng, |i| i.fitness())
-            .expect("Received empty population")
+            .expect("Failed to select from population")
     }
 }
 
