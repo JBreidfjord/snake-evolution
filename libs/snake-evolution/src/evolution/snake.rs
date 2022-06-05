@@ -2,10 +2,14 @@ use ordered_float::OrderedFloat;
 use rand::prelude::*;
 use strum::IntoEnumIterator;
 
+use lib_genetic_algorithm::Chromosome;
+
 use crate::evolution::brain::Brain;
 use crate::snake::direction::Direction;
 use crate::snake::game::Game;
+use crate::GAME_GRID_SIZE;
 
+#[derive(Clone)]
 pub(crate) struct Snake {
     pub(crate) game: Game,
     pub(crate) brain: Brain,
@@ -64,5 +68,19 @@ impl Snake {
 
     pub(crate) fn fitness(&self) -> f32 {
         self.game.score() as f32 - self.game.step_count() as f32 * 0.01
+    }
+
+    pub(crate) fn as_chromosome(&self) -> Chromosome {
+        self.brain.as_chromosome()
+    }
+
+    pub(crate) fn from_chromosome(chromosome: Chromosome) -> Snake {
+        let game = Game::new(GAME_GRID_SIZE);
+        let brain = Brain::from_chromosome(chromosome);
+        Snake {
+            game,
+            brain,
+            history: Vec::new(),
+        }
     }
 }
