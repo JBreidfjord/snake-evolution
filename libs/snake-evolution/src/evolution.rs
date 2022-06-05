@@ -6,6 +6,7 @@ use lib_genetic_algorithm::{
 };
 
 use snake::Snake;
+use snake_individual::SnakeIndividual;
 
 mod brain;
 mod snake;
@@ -54,7 +55,23 @@ impl Evolution {
     }
 
     fn process_evolution(&mut self, rng: &mut dyn RngCore) {
-        todo!("Implement process evolution")
+        self.age = 0;
+
+        // Transform Vec<Snake> into Vec<SnakeIndividual>
+        let current_population: Vec<_> = self
+            .population
+            .iter()
+            .map(SnakeIndividual::from_snake)
+            .collect();
+
+        // Evolve the population
+        let evolved_population = self.ga.step(rng, &current_population);
+
+        // Transform Vec<SnakeIndividual> into Vec<Creature>
+        self.population = evolved_population
+            .into_iter()
+            .map(|individual| individual.into_snake())
+            .collect();
     }
 
     /// Step until end of current generation

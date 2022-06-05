@@ -1,5 +1,3 @@
-use rand::prelude::*;
-
 use lib_genetic_algorithm::{Chromosome, Individual};
 
 use crate::evolution::Snake;
