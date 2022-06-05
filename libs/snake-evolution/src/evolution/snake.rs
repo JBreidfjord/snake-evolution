@@ -67,7 +67,8 @@ impl Snake {
     }
 
     pub(crate) fn fitness(&self) -> f32 {
-        self.game.score() as f32 - self.game.step_count() as f32 * 0.01
+        // Assigns a minimum fitness of 1.0 for selection
+        (self.game.score() as f32 - self.game.step_count() as f32 * 0.01).max(1.0)
     }
 
     pub(crate) fn as_chromosome(&self) -> Chromosome {

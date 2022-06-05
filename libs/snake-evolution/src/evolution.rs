@@ -41,10 +41,8 @@ impl Evolution {
         }
     }
 
-    pub(crate) fn step(&mut self, rng: &mut dyn RngCore) {
+    pub(crate) fn step(&mut self) {
         self.process_movement();
-        self.process_evolution(rng);
-
         self.age += 1;
     }
 
@@ -78,8 +76,9 @@ impl Evolution {
     pub(crate) fn train(&mut self, rng: &mut dyn RngCore) {
         // TODO: Add progress bar
         while self.age < GENERATION_LENGTH {
-            self.step(rng);
+            self.step();
         }
+        self.process_evolution(rng);
     }
 
     pub(crate) fn save(&self) {
