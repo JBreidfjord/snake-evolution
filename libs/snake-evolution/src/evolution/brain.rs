@@ -23,11 +23,11 @@ impl Brain {
             },
             LayerTopology {
                 neurons: 18,
-                activation: Activation::ReLU,
+                activation: Activation::None,
             },
             LayerTopology {
                 neurons: 18,
-                activation: Activation::ReLU,
+                activation: Activation::None,
             },
             LayerTopology {
                 neurons: 4,

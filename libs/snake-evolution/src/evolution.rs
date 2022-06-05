@@ -1,3 +1,4 @@
+use console::Term;
 use ordered_float::OrderedFloat;
 use rand::prelude::*;
 
@@ -15,7 +16,6 @@ mod snake_individual;
 const POPULATION_SIZE: usize = 2000;
 const MUTATION_RATE: f32 = 0.15;
 const MUTATION_STRENGTH: f32 = 0.3;
-const GENERATION_LENGTH: usize = 10_000;
 
 pub(crate) struct Evolution {
     population: Vec<Snake>,
@@ -52,7 +52,7 @@ impl Evolution {
         }
     }
 
-    fn process_evolution(&mut self, rng: &mut dyn RngCore) {
+    pub(crate) fn process_evolution(&mut self, rng: &mut dyn RngCore) {
         self.age = 0;
 
         // Transform Vec<Snake> into Vec<SnakeIndividual>
@@ -73,12 +73,10 @@ impl Evolution {
     }
 
     /// Step until end of current generation
-    pub(crate) fn train(&mut self, rng: &mut dyn RngCore) {
-        // TODO: Add progress bar
-        while self.age < GENERATION_LENGTH {
+    pub(crate) fn train(&mut self) {
+        while self.population.iter().any(|s| !s.game.finished()) {
             self.step();
         }
-        self.process_evolution(rng);
     }
 
     pub(crate) fn save(&self) {
@@ -99,11 +97,7 @@ impl Evolution {
             .unwrap()
     }
 
-    pub(crate) fn age(&self) -> usize {
-        self.age
-    }
-
-    pub(crate) fn replay(&self, which: &str) {
+    pub(crate) fn replay(&self, which: &str, stdout: &Term) {
         if which != "best" || which != "worst" {
             return;
         }
@@ -117,6 +111,8 @@ impl Evolution {
         for display in &snake.history {
             print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
             println!("{}", display);
+            println!("Press any key to continue");
+            let _character = stdout.read_char().unwrap();
         }
     }
 }

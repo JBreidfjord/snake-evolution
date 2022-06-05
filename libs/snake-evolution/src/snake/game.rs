@@ -11,6 +11,7 @@ pub(crate) struct Game {
     food: isize,
     score: usize,
     step_count: usize,
+    remaining_moves: usize,
     finished: bool,
 }
 
@@ -42,6 +43,7 @@ impl Game {
             food,
             score: 0,
             step_count: 0,
+            remaining_moves: 200,
             finished: false,
         }
     }
@@ -71,6 +73,12 @@ impl Game {
 
     fn step(&mut self) {
         self.step_count += 1;
+        self.remaining_moves -= 1;
+
+        if self.remaining_moves == 0 {
+            self.game_over()
+        }
+
         let head = *self.snake.back().unwrap();
 
         // Check if snake has moved off grid vertically
@@ -86,6 +94,7 @@ impl Game {
         // Check if snake found the food
         if head == self.food {
             self.score += 1;
+            self.remaining_moves += 100;
             self.place_food();
         } else if self.snake.len() > MIN_SNAKE_LENGTH {
             self.snake.pop_front();
@@ -102,7 +111,6 @@ impl Game {
 
     fn game_over(&mut self) {
         self.finished = true;
-        println!("Game over!");
     }
 
     pub(crate) fn display(&self) -> String {

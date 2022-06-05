@@ -29,6 +29,10 @@ impl Snake {
     }
 
     pub(crate) fn make_move(&mut self) {
+        if self.game.finished() {
+            return;
+        }
+
         let vision = self.process_vision();
         let action = self.brain.nn.propagate(vision);
         let action_index = (0..action.len())
@@ -56,7 +60,7 @@ impl Snake {
                     vision[i * 3] = distance;
                 } else if self.game.snake().contains(&cursor) {
                     vision[i * 3 + 1] = distance;
-                } else if (0..self.game.size().pow(2)).contains(&cursor) {
+                } else if !(0..self.game.size().pow(2)).contains(&cursor) {
                     vision[i * 3 + 2] = distance;
                     break 'search_loop;
                 }
@@ -67,8 +71,7 @@ impl Snake {
     }
 
     pub(crate) fn fitness(&self) -> f32 {
-        // Assigns a minimum fitness of 1.0 for selection
-        (self.game.score() as f32 - self.game.step_count() as f32 * 0.01).max(1.0)
+        self.game.score() as f32 * 10.0 + self.game.step_count() as f32 * 0.01
     }
 
     pub(crate) fn as_chromosome(&self) -> Chromosome {
