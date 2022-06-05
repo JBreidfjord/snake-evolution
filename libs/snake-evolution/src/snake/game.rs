@@ -4,6 +4,7 @@ use crate::snake::direction::Direction;
 
 const MIN_SNAKE_LENGTH: usize = 2;
 
+#[derive(Clone)]
 pub(crate) struct Game {
     size: isize,
     snake: VecDeque<isize>,

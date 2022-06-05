@@ -3,6 +3,7 @@ use rand::prelude::*;
 use lib_genetic_algorithm::Chromosome;
 use lib_neural_network::{Activation, LayerTopology, Network};
 
+#[derive(Clone)]
 pub(crate) struct Brain {
     pub(crate) nn: Network,
 }
@@ -18,7 +19,7 @@ impl Brain {
         [
             LayerTopology {
                 neurons: 24,
-                activation: Activation::ReLU,
+                activation: Activation::None,
             },
             LayerTopology {
                 neurons: 18,
