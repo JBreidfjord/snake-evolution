@@ -104,3 +104,112 @@ impl Snake {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod vision {
+        use super::*;
+
+        #[test]
+        fn test_vision() {
+            let mut rng = rand::thread_rng();
+            let snake = Snake::random(&mut rng, 3);
+            let vision = snake.process_vision();
+            assert_eq!(vision.len(), 24);
+        }
+
+        #[test]
+        fn test_food_vision() {
+            let mut rng = rand::thread_rng();
+            let mut snake = Snake::random(&mut rng, 3);
+            snake.game.set_food(Position { x: 0, y: 0 });
+            let vision = snake.process_vision();
+            assert_eq!(vision[0], 0.0, "Food Vision Up");
+            assert_eq!(vision[3], 0.0, "Food Vision Down");
+            assert_eq!(vision[6], 0.0, "Food Vision Left");
+            assert_eq!(vision[9], 0.0, "Food Vision Right");
+            assert_eq!(vision[12], 1.0, "Food Vision UpLeft");
+            assert_eq!(vision[15], 0.0, "Food Vision UpRight");
+            assert_eq!(vision[18], 0.0, "Food Vision DownLeft");
+            assert_eq!(vision[21], 0.0, "Food Vision DownRight");
+
+            snake.game.move_snake(Direction::Left);
+            let vision = snake.process_vision();
+            assert_eq!(vision[0], 1.0, "Food Vision Up");
+            assert_eq!(vision[3], 0.0, "Food Vision Down");
+            assert_eq!(vision[6], 0.0, "Food Vision Left");
+            assert_eq!(vision[9], 0.0, "Food Vision Right");
+            assert_eq!(vision[12], 0.0, "Food Vision UpLeft");
+            assert_eq!(vision[15], 0.0, "Food Vision UpRight");
+            assert_eq!(vision[18], 0.0, "Food Vision DownLeft");
+            assert_eq!(vision[21], 0.0, "Food Vision DownRight");
+        }
+
+        #[test]
+        fn test_tail_vision() {
+            let mut rng = rand::thread_rng();
+            let mut snake = Snake::random(&mut rng, 3);
+            snake.game.set_food(Position { x: 0, y: 0 });
+            snake.game.move_snake(Direction::Left);
+            let vision = snake.process_vision();
+            assert_eq!(vision[1], 0.0, "Tail Vision Up");
+            assert_eq!(vision[4], 0.0, "Tail Vision Down");
+            assert_eq!(vision[7], 0.0, "Tail Vision Left");
+            assert_eq!(vision[10], 1.0, "Tail Vision Right");
+            assert_eq!(vision[13], 0.0, "Tail Vision UpLeft");
+            assert_eq!(vision[16], 0.0, "Tail Vision UpRight");
+            assert_eq!(vision[19], 0.0, "Tail Vision DownLeft");
+            assert_eq!(vision[22], 0.0, "Tail Vision DownRight");
+
+            snake.game.move_snake(Direction::Up);
+            let vision = snake.process_vision();
+            assert_eq!(vision[1], 0.0, "Tail Vision Up");
+            assert_eq!(vision[4], 1.0, "Tail Vision Down");
+            assert_eq!(vision[7], 0.0, "Tail Vision Left");
+            assert_eq!(vision[10], 0.0, "Tail Vision Right");
+            assert_eq!(vision[13], 0.0, "Tail Vision UpLeft");
+            assert_eq!(vision[16], 0.0, "Tail Vision UpRight");
+            assert_eq!(vision[19], 0.0, "Tail Vision DownLeft");
+            assert_eq!(vision[22], 1.0, "Tail Vision DownRight");
+        }
+
+        #[test]
+        fn test_wall_vision() {
+            let mut rng = rand::thread_rng();
+            let mut snake = Snake::random(&mut rng, 3);
+            let vision = snake.process_vision();
+            assert_eq!(vision[2], 2.0, "Wall Vision Up");
+            assert_eq!(vision[5], 2.0, "Wall Vision Down");
+            assert_eq!(vision[8], 2.0, "Wall Vision Left");
+            assert_eq!(vision[11], 2.0, "Wall Vision Right");
+            assert_eq!(vision[14], 2.0, "Wall Vision UpLeft");
+            assert_eq!(vision[17], 2.0, "Wall Vision UpRight");
+            assert_eq!(vision[20], 2.0, "Wall Vision DownLeft");
+            assert_eq!(vision[23], 2.0, "Wall Vision DownRight");
+
+            snake.game.move_snake(Direction::Left);
+            let vision = snake.process_vision();
+            assert_eq!(vision[2], 2.0, "Wall Vision Up");
+            assert_eq!(vision[5], 2.0, "Wall Vision Down");
+            assert_eq!(vision[8], 1.0, "Wall Vision Left");
+            assert_eq!(vision[11], 3.0, "Wall Vision Right");
+            assert_eq!(vision[14], 1.0, "Wall Vision UpLeft");
+            assert_eq!(vision[17], 2.0, "Wall Vision UpRight");
+            assert_eq!(vision[20], 1.0, "Wall Vision DownLeft");
+            assert_eq!(vision[23], 2.0, "Wall Vision DownRight");
+
+            snake.game.move_snake(Direction::Down);
+            let vision = snake.process_vision();
+            assert_eq!(vision[2], 3.0, "Wall Vision Up");
+            assert_eq!(vision[5], 1.0, "Wall Vision Down");
+            assert_eq!(vision[8], 1.0, "Wall Vision Left");
+            assert_eq!(vision[11], 3.0, "Wall Vision Right");
+            assert_eq!(vision[14], 1.0, "Wall Vision UpLeft");
+            assert_eq!(vision[17], 3.0, "Wall Vision UpRight");
+            assert_eq!(vision[20], 1.0, "Wall Vision DownLeft");
+            assert_eq!(vision[23], 1.0, "Wall Vision DownRight");
+        }
+    }
+}
