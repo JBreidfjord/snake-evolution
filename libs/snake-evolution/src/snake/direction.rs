@@ -1,5 +1,7 @@
 use strum_macros::EnumIter;
 
+use crate::snake::position::Position;
+
 #[derive(PartialEq, EnumIter)]
 pub(crate) enum Direction {
     Up,
@@ -23,16 +25,16 @@ impl Direction {
         }
     }
 
-    pub(crate) fn value(&self) -> (isize, isize) {
+    pub(crate) fn value(&self) -> Position {
         match *self {
-            Direction::Up => (0, -1),
-            Direction::Down => (0, 1),
-            Direction::Left => (-1, 0),
-            Direction::Right => (1, 0),
-            Direction::UpLeft => (-1, -1),
-            Direction::UpRight => (1, -1),
-            Direction::DownLeft => (-1, 1),
-            Direction::DownRight => (1, 1),
+            Direction::Up => Position { x: 0, y: -1 },
+            Direction::Down => Position { x: 0, y: 1 },
+            Direction::Left => Position { x: -1, y: 0 },
+            Direction::Right => Position { x: 1, y: 0 },
+            Direction::UpLeft => Position { x: -1, y: -1 },
+            Direction::UpRight => Position { x: 1, y: -1 },
+            Direction::DownLeft => Position { x: -1, y: 1 },
+            Direction::DownRight => Position { x: 1, y: 1 },
         }
     }
 }
@@ -43,13 +45,13 @@ mod tests {
 
     #[test]
     fn test_value() {
-        assert_eq!(Direction::Up.value(), (0, -1));
-        assert_eq!(Direction::Down.value(), (0, 1));
-        assert_eq!(Direction::Left.value(), (-1, 0));
-        assert_eq!(Direction::Right.value(), (1, 0));
-        assert_eq!(Direction::UpLeft.value(), (-1, -1));
-        assert_eq!(Direction::UpRight.value(), (1, -1));
-        assert_eq!(Direction::DownLeft.value(), (-1, 1));
-        assert_eq!(Direction::DownRight.value(), (1, 1));
+        assert_eq!(Direction::Up.value(), Position { x: 0, y: -1 });
+        assert_eq!(Direction::Down.value(), Position { x: 0, y: 1 });
+        assert_eq!(Direction::Left.value(), Position { x: -1, y: 0 });
+        assert_eq!(Direction::Right.value(), Position { x: 1, y: 0 });
+        assert_eq!(Direction::UpLeft.value(), Position { x: -1, y: -1 });
+        assert_eq!(Direction::UpRight.value(), Position { x: 1, y: -1 });
+        assert_eq!(Direction::DownLeft.value(), Position { x: -1, y: 1 });
+        assert_eq!(Direction::DownRight.value(), Position { x: 1, y: 1 });
     }
 }
