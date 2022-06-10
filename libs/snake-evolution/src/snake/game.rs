@@ -30,11 +30,9 @@ impl Game {
         snake.push_back(center_square);
 
         let snake_set: HashSet<Position> = snake.iter().cloned().collect();
-        let board_set: HashSet<Position> = HashSet::from_iter(
-            (0..size.pow(2))
-                .map(|i| Position::new(i, i))
-                .collect::<Vec<_>>(),
-        );
+        let board_set: HashSet<Position> = (0..size)
+            .flat_map(|x| (0..size).map(move |y| Position::new(x, y)))
+            .collect();
         let valid_squares = &board_set - &snake_set;
         let food = *valid_squares.iter().next().unwrap();
 
@@ -101,11 +99,9 @@ impl Game {
 
     fn place_food(&mut self) {
         let snake_set: HashSet<Position> = self.snake.iter().cloned().collect();
-        let board_set: HashSet<Position> = HashSet::from_iter(
-            (0..self.size.pow(2))
-                .map(|i| Position::new(i, i))
-                .collect::<Vec<_>>(),
-        );
+        let board_set: HashSet<Position> = (0..self.size)
+            .flat_map(|x| (0..self.size).map(move |y| Position::new(x, y)))
+            .collect();
         let valid_squares = &board_set - &snake_set;
         self.food = *valid_squares.iter().next().unwrap();
     }
