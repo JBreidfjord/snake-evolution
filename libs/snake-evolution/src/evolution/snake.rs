@@ -7,6 +7,7 @@ use lib_genetic_algorithm::Chromosome;
 use crate::evolution::brain::Brain;
 use crate::snake::direction::Direction;
 use crate::snake::game::Game;
+use crate::snake::position::Position;
 use crate::GAME_GRID_SIZE;
 
 #[derive(Clone)]
@@ -47,20 +48,23 @@ impl Snake {
     fn process_vision(&self) -> Vec<f32> {
         let head = *self.game.snake().back().unwrap();
         let mut vision = vec![0.0; 24];
+
         for (i, direction) in Direction::iter().enumerate() {
             let mut cursor = head;
-            let (x, y) = direction.value();
-
             let mut distance = 0.0;
-            'search_loop: loop {
-                cursor += x + y * self.game.size();
-                distance += 1.0;
 
-                if cursor == self.game.food() {
+            'search_loop: loop {
+                distance += 1.0;
+                cursor += direction.value();
+
+                if self.is_food_collision(&cursor) {
                     vision[i * 3] = distance;
-                } else if self.game.snake().contains(&cursor) {
-                    vision[i * 3 + 1] = distance;
-                } else if !(0..self.game.size().pow(2)).contains(&cursor) {
+                } else if self.is_tail_collision(&cursor) {
+                    // We want nearest tail, so only set if it hasn't been set yet
+                    if vision[i * 3 + 1] == 0.0 {
+                        vision[i * 3 + 1] = distance;
+                    }
+                } else if self.is_wall_collision(&cursor) {
                     vision[i * 3 + 2] = distance;
                     break 'search_loop;
                 }
@@ -68,6 +72,18 @@ impl Snake {
         }
 
         vision
+    }
+
+    fn is_food_collision(&self, position: &Position) -> bool {
+        todo!("Implement food collision check")
+    }
+
+    fn is_wall_collision(&self, position: &Position) -> bool {
+        todo!("Implement wall collision check")
+    }
+
+    fn is_tail_collision(&self, position: &Position) -> bool {
+        todo!("Implement tail collision check")
     }
 
     pub(crate) fn fitness(&self) -> f32 {
