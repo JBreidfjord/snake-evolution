@@ -1,7 +1,7 @@
 use rand::prelude::*;
 use std::ops::{Add, AddAssign};
 
-#[derive(Clone, PartialEq, Hash, Eq, Debug)]
+#[derive(Clone, PartialEq, Hash, Eq, Debug, Copy)]
 pub(crate) struct Position {
     pub(crate) x: isize,
     pub(crate) y: isize,

@@ -1,14 +1,15 @@
 use std::collections::{HashSet, VecDeque};
 
 use crate::snake::direction::Direction;
+use crate::snake::position::Position;
 
 const MIN_SNAKE_LENGTH: usize = 2;
 
 #[derive(Clone)]
 pub(crate) struct Game {
     size: isize,
-    snake: VecDeque<isize>,
-    food: isize,
+    snake: VecDeque<Position>,
+    food: Position,
     score: usize,
     step_count: usize,
     remaining_moves: usize,
@@ -22,18 +23,18 @@ impl Game {
         }
 
         // Calculate center square for initial snake placement
-        let center = if size % 2 == 0 {
-            size / 2
-        } else {
-            size / 2 + 1
-        };
-        let center_square = size * (center - 1) + center - 1;
+        let center = size / 2;
+        let center_square = Position::new(center, center);
 
         let mut snake = VecDeque::with_capacity(size.pow(2).try_into().unwrap());
         snake.push_back(center_square);
 
-        let snake_set: HashSet<isize> = snake.iter().cloned().collect();
-        let board_set: HashSet<isize> = HashSet::from_iter((0..size.pow(2)).collect::<Vec<_>>());
+        let snake_set: HashSet<Position> = snake.iter().cloned().collect();
+        let board_set: HashSet<Position> = HashSet::from_iter(
+            (0..size.pow(2))
+                .map(|i| Position::new(i, i))
+                .collect::<Vec<_>>(),
+        );
         let valid_squares = &board_set - &snake_set;
         let food = *valid_squares.iter().next().unwrap();
 
@@ -53,41 +54,38 @@ impl Game {
             return;
         }
 
-        let (x, y) = direction.value();
         let mut head = *self.snake.back().unwrap();
 
         // Check if next move would cause snake to collide with wall
-        if (head % self.size == self.size - 1 && direction == Direction::Right)
-            || (head % self.size == 0 && direction == Direction::Left)
+        if (head.x == self.size && direction == Direction::Right)
+            || (head.x == 0 && direction == Direction::Left)
         {
             self.game_over()
         }
 
-        // Add x and y values to current head index
-        // y is multiplied by grid size to shift index by a whole row
-        head += x + y * self.size;
+        head += direction.value();
         self.snake.push_back(head);
 
         self.step();
     }
 
     fn step(&mut self) {
-        self.step_count += 1;
-        self.remaining_moves -= 1;
-
-        if self.remaining_moves == 0 {
-            self.game_over()
-        }
-
         let head = *self.snake.back().unwrap();
 
         // Check if snake has moved off grid vertically
-        if !(0..self.size.pow(2)).contains(&head) {
+        if !(0..self.size).contains(&head.y) {
             self.game_over()
         }
 
         // Check if snake moved into itself
         if self.snake.iter().filter(|i| *i == &head).count() > 1 {
+            self.game_over()
+        }
+
+        self.step_count += 1;
+        self.remaining_moves -= 1;
+
+        if self.remaining_moves == 0 {
             self.game_over()
         }
 
@@ -102,9 +100,12 @@ impl Game {
     }
 
     fn place_food(&mut self) {
-        let snake_set: HashSet<isize> = self.snake.iter().cloned().collect();
-        let board_set: HashSet<isize> =
-            HashSet::from_iter((0..self.size.pow(2)).collect::<Vec<_>>());
+        let snake_set: HashSet<Position> = self.snake.iter().cloned().collect();
+        let board_set: HashSet<Position> = HashSet::from_iter(
+            (0..self.size.pow(2))
+                .map(|i| Position::new(i, i))
+                .collect::<Vec<_>>(),
+        );
         let valid_squares = &board_set - &snake_set;
         self.food = *valid_squares.iter().next().unwrap();
     }
@@ -121,15 +122,14 @@ impl Game {
             out += "---"
         }
 
-        let range = (0..self.size.pow(2)).step_by(self.size.try_into().unwrap());
-        for y in range {
+        for y in 0..self.size {
             out += "|\n|";
             for x in 0..self.size {
-                let i = y + x;
-                out += match i {
-                    n if n == head => " \u{25A1} ",
-                    n if n == self.food => " \u{2022} ",
-                    n if self.snake.contains(&n) => " \u{25A0} ",
+                let position = Position::new(x, y);
+                out += match position {
+                    p if p == head => " \u{25A1} ",
+                    p if p == self.food => " \u{2022} ",
+                    p if self.snake.contains(&p) => " \u{25A0} ",
                     _ => "   ",
                 };
             }
@@ -158,16 +158,23 @@ impl Game {
         self.step_count
     }
 
-    pub(crate) fn snake(&self) -> &VecDeque<isize> {
+    pub(crate) fn snake(&self) -> &VecDeque<Position> {
         &self.snake
     }
 
-    pub(crate) fn food(&self) -> isize {
+    pub(crate) fn food(&self) -> Position {
         self.food
     }
 
     pub(crate) fn size(&self) -> isize {
         self.size
+    }
+
+    pub(crate) fn set_food(&mut self, food: Position) {
+        assert!(!self.snake.contains(&food));
+        assert!((0..self.size).contains(&food.x));
+        assert!((0..self.size).contains(&food.y));
+        self.food = food;
     }
 }
 
@@ -181,21 +188,25 @@ mod tests {
         #[test]
         fn test_initial_snake_placement() {
             let game = Game::new(10);
-            assert_eq!(game.snake, VecDeque::from([44]));
+            assert_eq!(game.snake, VecDeque::from([Position { x: 5, y: 5 }]));
 
             let game = Game::new(3);
-            assert_eq!(game.snake, VecDeque::from([4]));
+            assert_eq!(game.snake, VecDeque::from([Position { x: 1, y: 1 }]));
         }
 
         #[test]
         fn test_initial_food_placement() {
-            let game = Game::new(3);
-            assert_ne!(game.food, 4);
-            assert!((0..9).contains(&game.food));
+            let size = 3;
+            let game = Game::new(size);
+            assert_ne!(game.food, Position { x: 1, y: 1 });
+            assert!((0..size).contains(&game.food.x));
+            assert!((0..size).contains(&game.food.y));
 
-            let game = Game::new(10);
-            assert_ne!(game.food, 44);
-            assert!((0..100).contains(&game.food));
+            let size = 10;
+            let game = Game::new(size);
+            assert_ne!(game.food, Position { x: 5, y: 5 });
+            assert!((0..size).contains(&game.food.x));
+            assert!((0..size).contains(&game.food.y));
         }
     }
 
@@ -205,43 +216,55 @@ mod tests {
         #[test]
         fn test_move() {
             let mut game = Game::new(3);
-            game.food = 0;
+            game.food = Position { x: 0, y: 0 };
 
             game.move_snake(Direction::Left);
-            assert_eq!(game.snake, VecDeque::from([4, 3]));
+            assert_eq!(
+                game.snake,
+                VecDeque::from([Position { x: 1, y: 1 }, Position { x: 0, y: 1 }])
+            );
 
             game.move_snake(Direction::Down);
-            assert_eq!(game.snake, VecDeque::from([3, 6]));
+            assert_eq!(
+                game.snake,
+                VecDeque::from([Position { x: 0, y: 1 }, Position { x: 0, y: 2 }])
+            );
 
             game.move_snake(Direction::Right);
-            assert_eq!(game.snake, VecDeque::from([6, 7]));
+            assert_eq!(
+                game.snake,
+                VecDeque::from([Position { x: 0, y: 2 }, Position { x: 1, y: 2 }])
+            );
 
             game.move_snake(Direction::Up);
-            assert_eq!(game.snake, VecDeque::from([7, 4]));
+            assert_eq!(
+                game.snake,
+                VecDeque::from([Position { x: 1, y: 2 }, Position { x: 1, y: 1 }])
+            );
         }
 
         #[test]
         fn test_wall_collisions() {
             let mut game = Game::new(3);
-            game.food = 0;
+            game.food = Position { x: 0, y: 0 };
             game.move_snake(Direction::Left);
             game.move_snake(Direction::Left);
             assert!(game.finished);
 
             let mut game = Game::new(3);
-            game.food = 0;
+            game.food = Position { x: 0, y: 0 };
             game.move_snake(Direction::Up);
             game.move_snake(Direction::Up);
             assert!(game.finished);
 
             let mut game = Game::new(3);
-            game.food = 0;
+            game.food = Position { x: 0, y: 0 };
             game.move_snake(Direction::Right);
             game.move_snake(Direction::Right);
             assert!(game.finished);
 
             let mut game = Game::new(3);
-            game.food = 0;
+            game.food = Position { x: 0, y: 0 };
             game.move_snake(Direction::Down);
             game.move_snake(Direction::Down);
             assert!(game.finished);
@@ -250,7 +273,7 @@ mod tests {
         #[test]
         fn test_snake_collision() {
             let mut game = Game::new(3);
-            game.food = 0;
+            game.food = Position { x: 0, y: 0 };
 
             game.move_snake(Direction::Left);
             game.move_snake(Direction::Right);
@@ -260,12 +283,19 @@ mod tests {
         #[test]
         fn test_food_collision() {
             let mut game = Game::new(3);
-            game.food = 0;
+            game.food = Position { x: 0, y: 0 };
 
             game.move_snake(Direction::Left);
             game.move_snake(Direction::Up);
             assert_eq!(game.snake.len(), 3);
-            assert_eq!(game.snake, VecDeque::from([4, 3, 0]));
+            assert_eq!(
+                game.snake,
+                VecDeque::from([
+                    Position { x: 1, y: 1 },
+                    Position { x: 0, y: 1 },
+                    Position { x: 0, y: 0 }
+                ])
+            );
             assert_eq!(game.score, 1);
         }
     }
@@ -275,13 +305,14 @@ mod tests {
 
         #[test]
         fn test_place_food() {
-            let mut game = Game::new(3);
-            game.food = 3;
+            let size = 3;
+            let mut game = Game::new(size);
+            game.food = Position { x: 0, y: 1 };
             game.move_snake(Direction::Left);
 
-            assert!((0..9).contains(&game.food));
-            assert_ne!(game.food, 4);
-            assert_ne!(game.food, 3);
+            assert!((0..3).contains(&game.food.x));
+            assert!((0..3).contains(&game.food.y));
+            assert!(!game.snake.contains(&game.food));
         }
     }
 }
