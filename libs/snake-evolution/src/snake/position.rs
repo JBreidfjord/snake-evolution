@@ -1,5 +1,5 @@
 use rand::prelude::*;
-use std::ops::Add;
+use std::ops::{Add, AddAssign};
 
 #[derive(Clone, PartialEq, Hash, Eq, Debug)]
 pub(crate) struct Position {
@@ -28,5 +28,12 @@ impl Add for Position {
             x: self.x + other.x,
             y: self.y + other.y,
         }
+    }
+}
+
+impl AddAssign for Position {
+    fn add_assign(&mut self, other: Position) {
+        self.x += other.x;
+        self.y += other.y;
     }
 }
