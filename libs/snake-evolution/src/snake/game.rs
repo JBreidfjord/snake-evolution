@@ -54,13 +54,6 @@ impl Game {
 
         let mut head = *self.snake.back().unwrap();
 
-        // Check if next move would cause snake to collide with wall
-        if (head.x == self.size && direction == Direction::Right)
-            || (head.x == 0 && direction == Direction::Left)
-        {
-            self.game_over()
-        }
-
         head += direction.value();
         self.snake.push_back(head);
 
@@ -69,6 +62,11 @@ impl Game {
 
     fn step(&mut self) {
         let head = *self.snake.back().unwrap();
+
+        // Check if snake has moved off grid horizontally
+        if !(0..self.size).contains(&head.x) {
+            self.game_over()
+        }
 
         // Check if snake has moved off grid vertically
         if !(0..self.size).contains(&head.y) {
