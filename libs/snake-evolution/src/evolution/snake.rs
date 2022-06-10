@@ -59,12 +59,16 @@ impl Snake {
 
                 if self.is_food_collision(&cursor) {
                     vision[i * 3] = distance;
-                } else if self.is_tail_collision(&cursor) {
+                }
+
+                if self.is_tail_collision(&cursor) {
                     // We want nearest tail, so only set if it hasn't been set yet
                     if vision[i * 3 + 1] == 0.0 {
                         vision[i * 3 + 1] = distance;
                     }
-                } else if self.is_wall_collision(&cursor) {
+                }
+
+                if self.is_wall_collision(&cursor) {
                     vision[i * 3 + 2] = distance;
                     break 'search_loop;
                 }
@@ -75,15 +79,16 @@ impl Snake {
     }
 
     fn is_food_collision(&self, position: &Position) -> bool {
-        todo!("Implement food collision check")
+        &self.game.food() == position
     }
 
     fn is_wall_collision(&self, position: &Position) -> bool {
-        todo!("Implement wall collision check")
+        let boundary = 0..self.game.size();
+        !boundary.contains(&position.x) || !boundary.contains(&position.y)
     }
 
     fn is_tail_collision(&self, position: &Position) -> bool {
-        todo!("Implement tail collision check")
+        self.game.snake().contains(position)
     }
 
     pub(crate) fn fitness(&self) -> f32 {
